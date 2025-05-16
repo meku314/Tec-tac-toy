@@ -1,0 +1,135 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tic Tac Toe - Neon</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: radial-gradient(circle, #1b0034, #000);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      flex-direction: column;
+      color: white;
+    }
+    .start-screen, .game-container {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+    }
+    .start-screen.active, .game-container.active {
+      display: flex;
+    }
+    button {
+      padding: 12px 24px;
+      font-size: 1.2rem;
+      background: #6f00ff;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-template-rows: repeat(3, 100px);
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .cell {
+      width: 100px;
+      height: 100px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid #ffffff20;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      color: #00ffff;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    .cell:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    .cell.X { color: #ff5c5c; }
+    .winner {
+      margin-top: 20px;
+      font-size: 1.5rem;
+      color: #00ffcc;
+    }
+  </style>
+</head>
+<body>
+  <div class="start-screen active" id="startScreen">
+    <h1>Tic Tac Toe</h1>
+    <button onclick="startGame()">Start Game</button>
+  </div>  <div class="game-container" id="gameContainer">
+    <div class="board" id="board"></div>
+    <div class="winner" id="winnerText"></div>
+  </div>  <script>
+    const board = document.getElementById('board');
+    const winnerText = document.getElementById('winnerText');
+    const startScreen = document.getElementById('startScreen');
+    const gameContainer = document.getElementById('gameContainer');
+
+    let currentPlayer = 'O'; // Player is O, computer is X
+    let cells = [];
+
+    function startGame() {
+      startScreen.classList.remove('active');
+      gameContainer.classList.add('active');
+      initBoard();
+    }
+
+    function initBoard() {
+      board.innerHTML = '';
+      winnerText.textContent = '';
+      cells = Array(9).fill(null);
+      for (let i = 0; i < 9; i++) {
+        const cell = document.createElement('div');
+        cell.classList.add('cell');
+        cell.addEventListener('click', () => makeMove(i));
+        board.appendChild(cell);
+      }
+    }
+
+    function makeMove(index) {
+      if (cells[index] || winnerText.textContent) return;
+      const cell = board.children[index];
+      cell.textContent = currentPlayer;
+      cell.classList.add(currentPlayer);
+      cells[index] = currentPlayer;
+      if (checkWin(currentPlayer)) {
+        winnerText.textContent = `${currentPlayer} Wins!`;
+        return;
+      } else if (cells.every(c => c)) {
+        winnerText.textContent = "It's a Draw!";
+        return;
+      }
+      currentPlayer = currentPlayer === 'O' ? 'X' : 'O';
+      if (currentPlayer === 'X') setTimeout(computerMove, 500);
+    }
+
+    function computerMove() {
+      let emptyIndices = cells.map((val, idx) => val ? null : idx).filter(val => val !== null);
+      if (emptyIndices.length === 0) return;
+      let choice = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
+      makeMove(choice);
+    }
+
+    function checkWin(player) {
+      const wins = [
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6]
+      ];
+      return wins.some(combo => combo.every(i => cells[i] === player));
+    }
+  </script></body>
+</html>
